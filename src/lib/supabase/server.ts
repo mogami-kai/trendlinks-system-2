@@ -1,0 +1,32 @@
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { cookies } from "next/headers";
+
+type CookieToSet = { name: string; value: string; options: CookieOptions };
+
+/**
+ * サーバーコンポーネント / Server Action / Route Handler 用クライアント。
+ * リクエスト時に生成するため、env 未設定でもビルドは通る。
+ */
+export function createClient() {
+  const cookieStore = cookies();
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet: CookieToSet[]) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // Server Component から呼ばれた場合は無視 (middleware で更新される)
+          }
+        },
+      },
+    }
+  );
+}
