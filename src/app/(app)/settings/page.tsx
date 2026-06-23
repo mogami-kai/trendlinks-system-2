@@ -57,12 +57,11 @@ export default async function SettingsPage() {
 
       <h2 className="mb-2 mt-8 text-lg font-semibold">セキュリティ</h2>
       <div className="card text-sm text-slate-600">
-        パスワードの変更は
-        <a href="/update-password" className="text-brand-600 hover:underline">
-          {" "}
-          こちら
+        パスワード変更・2要素認証 (TOTP) の設定は{" "}
+        <a href="/settings/security" className="text-brand-600 hover:underline">
+          セキュリティ設定
         </a>
-        。2要素認証 (TOTP) は Supabase Auth で利用できます。
+        {" "}から行えます。
       </div>
     </div>
   );

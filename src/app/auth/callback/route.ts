@@ -23,8 +23,9 @@ export async function GET(request: Request) {
           .select("id")
           .eq("id", user.id)
           .maybeSingle();
-        if (!profile) {
-          const meta = user.user_metadata || {};
+        const meta = user.user_metadata || {};
+        // 招待ユーザー (tenant_id を持つ) は新規テナントを作らない
+        if (!profile && !meta.tenant_id) {
           await supabase.rpc("create_tenant_and_owner", {
             company: meta.company_name || meta.full_name || "マイ会社",
             owner_name: meta.full_name || user.email || "",

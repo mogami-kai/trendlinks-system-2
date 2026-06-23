@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireSession, isAdmin } from "@/lib/auth";
 import { workOrderSchema } from "@/lib/validators";
+import { dispatchWorkOrder } from "@/lib/dispatch";
 
 function parseWO(formData: FormData) {
   return workOrderSchema.parse({
@@ -46,12 +47,9 @@ export async function createWorkOrder(formData: FormData) {
   if (error) throw new Error(error.message);
   await syncAssignees(data.id, assignee_ids);
 
-  // 作成と同時に LINE 配信する場合
+  // 作成と同時に LINE 配信する場合 (認証済みクライアントで直接実行)
   if (formData.get("dispatch") === "on") {
-    await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/work-orders/${data.id}/dispatch`,
-      { method: "POST", headers: { cookie: "" } }
-    ).catch(() => {});
+    await dispatchWorkOrder(supabase, session.tenantId, data.id).catch(() => {});
   }
 
   revalidatePath("/work-orders");

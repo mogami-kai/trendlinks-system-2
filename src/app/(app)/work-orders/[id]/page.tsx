@@ -39,13 +39,19 @@ export default async function WorkOrderDetailPage({
   const assignees =
     wo.work_order_assignees?.map((a: any) => a.profiles?.full_name).filter(Boolean) ||
     [];
+  const assigneeIds: string[] =
+    wo.work_order_assignees?.map((a: any) => a.profiles?.id).filter(Boolean) || [];
+  const canUpdateStatus =
+    isAdmin(session.role) || assigneeIds.includes(session.userId);
 
   return (
     <div>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-bold">{wo.sites?.name ?? "作業指示"}</h1>
         <div className="flex items-center gap-2">
-          <StatusControl workOrderId={wo.id} current={wo.status} />
+          {canUpdateStatus && (
+            <StatusControl workOrderId={wo.id} current={wo.status} />
+          )}
           {isAdmin(session.role) && (
             <Link href={`/work-orders/${wo.id}/edit`} className="btn-secondary">
               編集

@@ -5,6 +5,7 @@
 スマホ完結で提供する。マルチテナント / サブスクリプション課金対応。
 
 - 📄 要件定義書: [`docs/requirements/`](./docs/requirements/README.md)
+- ✅ **セットアップ手順（あなたにしかできない作業）: [`docs/SETUP_CHECKLIST.md`](./docs/SETUP_CHECKLIST.md)**
 - 🧩 技術スタック: **Next.js 14 (App Router) / TypeScript / Tailwind CSS / Supabase / Stripe / Vercel**
 
 ## 主な機能

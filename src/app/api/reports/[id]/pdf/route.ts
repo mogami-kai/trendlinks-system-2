@@ -76,7 +76,7 @@ export async function POST(
         storage_path: path,
         generated_at: new Date().toISOString(),
       },
-      { onConflict: "report_id" as any }
+      { onConflict: "report_id" }
     );
 
     const { data: signed } = await admin.storage
