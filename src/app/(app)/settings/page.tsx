@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireSession } from "@/lib/auth";
 import { PageHeader } from "@/components/PageHeader";
 import { updateProfile, updateCompany } from "./actions";
+import { LineLink } from "./LineLink";
 
 export default async function SettingsPage() {
   const session = await requireSession();
@@ -38,6 +39,9 @@ export default async function SettingsPage() {
         <button className="btn-primary">保存</button>
       </form>
 
+      <h2 className="mb-2 mt-8 text-lg font-semibold">LINE 連携</h2>
+      <LineLink linked={!!profile?.line_user_id} />
+
       {session.role === "owner" && (
         <>
           <h2 className="mb-2 mt-8 text-lg font-semibold">会社情報</h2>
@@ -52,6 +56,26 @@ export default async function SettingsPage() {
             </div>
             <button className="btn-primary">保存</button>
           </form>
+        </>
+      )}
+
+      {session.role !== "staff" && (
+        <>
+          <h2 className="mb-2 mt-8 text-lg font-semibold">データ管理</h2>
+          <div className="card space-y-2 text-sm">
+            <div>
+              <a href="/settings/notifications" className="text-brand-600 hover:underline">
+                配信ログを見る
+              </a>
+            </div>
+            <div className="text-slate-600">CSV エクスポート:</div>
+            <div className="flex flex-wrap gap-3">
+              <a href="/api/export/sites" className="text-brand-600 hover:underline">現場</a>
+              <a href="/api/export/work-orders" className="text-brand-600 hover:underline">作業指示</a>
+              <a href="/api/export/reports" className="text-brand-600 hover:underline">報告</a>
+              <a href="/api/export/customers" className="text-brand-600 hover:underline">取引先</a>
+            </div>
+          </div>
         </>
       )}
 

@@ -28,6 +28,7 @@
   - [ ] `supabase/migrations/0001_init.sql`
   - [ ] `supabase/migrations/0002_policies.sql`
   - [ ] `supabase/migrations/0003_security_fixes.sql`
+  - [ ] `supabase/migrations/0004_line_link_codes.sql`
   - （Supabase CLI 利用時は `supabase db push` でも可）
 - [ ] ⚙️ Storage → 新規バケットを 2 つ作成（いずれも **Private**）
   - [ ] `report-photos`（現場写真）
@@ -63,9 +64,11 @@
 - [ ] 🔑 以下を取得し記入
   - [ ] `LINE_CHANNEL_ACCESS_TOKEN`（長期）
   - [ ] `LINE_CHANNEL_SECRET`
-- [ ] ⚙️ Webhook URL に `https://<本番ドメイン>/api/webhooks/line` を設定し有効化
-- [ ] ⚙️ 応答メッセージ等は任意。スタッフは公式アカウントを友だち追加し、
-      設定画面で各自の **LINE ユーザーID** を登録（または Webhook 連携実装を拡張）
+- [ ] ⚙️ Webhook URL に `https://<本番ドメイン>/api/webhooks/line` を設定し**有効化**
+      （応答メッセージはOFF推奨。Webhook の利用をON）
+- [ ] スタッフ連携は**自動化済み**: スタッフが公式アカウントを友だち追加 →
+      アプリ「設定 → LINE連携」で連携コードを発行 → そのコードをLINEトークに送信すると
+      `profiles.line_user_id` が自動で紐付く（手動ID入力も可）
 
 ## 5. Brevo（メール送信：PDF送付・通知）★必須
 - [ ] ⚙️ [Brevo](https://www.brevo.com) でアカウント作成

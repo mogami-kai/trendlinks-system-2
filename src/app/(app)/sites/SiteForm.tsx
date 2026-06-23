@@ -21,6 +21,23 @@ export function SiteForm({
   const d = defaults || {};
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lat, setLat] = useState<string>(d.lat ?? "");
+  const [lng, setLng] = useState<string>(d.lng ?? "");
+
+  function useCurrentLocation() {
+    if (!navigator.geolocation) {
+      setError("この端末では位置情報を取得できません。");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLat(pos.coords.latitude.toFixed(6));
+        setLng(pos.coords.longitude.toFixed(6));
+      },
+      (err) => setError(`位置情報の取得に失敗しました: ${err.message}`),
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
 
   return (
     <form
@@ -76,14 +93,36 @@ export function SiteForm({
         <label className="label">建物名</label>
         <input name="building" className="input" defaultValue={d.building} />
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="label">緯度 (GPS到着判定用)</label>
-          <input name="lat" type="number" step="any" className="input" defaultValue={d.lat} />
+      <div>
+        <div className="flex items-center justify-between">
+          <label className="label">緯度経度 (GPS到着判定用)</label>
+          <button
+            type="button"
+            onClick={useCurrentLocation}
+            className="text-xs text-brand-600 hover:underline"
+          >
+            現在地から取得
+          </button>
         </div>
-        <div>
-          <label className="label">経度</label>
-          <input name="lng" type="number" step="any" className="input" defaultValue={d.lng} />
+        <div className="grid grid-cols-2 gap-3">
+          <input
+            name="lat"
+            type="number"
+            step="any"
+            placeholder="緯度"
+            className="input"
+            value={lat}
+            onChange={(e) => setLat(e.target.value)}
+          />
+          <input
+            name="lng"
+            type="number"
+            step="any"
+            placeholder="経度"
+            className="input"
+            value={lng}
+            onChange={(e) => setLng(e.target.value)}
+          />
         </div>
       </div>
       <div>

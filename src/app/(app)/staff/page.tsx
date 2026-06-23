@@ -4,6 +4,7 @@ import { requireSession, isAdmin } from "@/lib/auth";
 import { PageHeader } from "@/components/PageHeader";
 import { PLANS } from "@/lib/plans";
 import { InviteForm } from "./InviteForm";
+import { StaffControls } from "./StaffControls";
 
 export default async function StaffPage() {
   const session = await requireSession();
@@ -27,7 +28,7 @@ export default async function StaffPage() {
 
       <ul className="space-y-2">
         {staff?.map((s) => (
-          <li key={s.id} className="card flex items-center justify-between">
+          <li key={s.id} className="card flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="font-medium">{s.full_name || "（未設定）"}</div>
               <div className="text-sm text-slate-500">
@@ -35,9 +36,15 @@ export default async function StaffPage() {
                 {s.line_user_id ? " ・ LINE連携済" : " ・ LINE未連携"}
               </div>
             </div>
-            <span className="badge bg-slate-100 text-slate-600">
-              {s.is_active ? "有効" : "無効"}
-            </span>
+            {s.id === session.userId ? (
+              <span className="badge bg-brand-100 text-brand-700">自分</span>
+            ) : (
+              <StaffControls
+                id={s.id}
+                role={s.role as "owner" | "admin" | "staff"}
+                active={s.is_active}
+              />
+            )}
           </li>
         ))}
       </ul>
