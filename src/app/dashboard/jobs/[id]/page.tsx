@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, FileUp, ImageIcon } from "lucide-react";
+import { ArrowLeft, FileUp, ImageIcon, Plus } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -21,10 +21,13 @@ import {
   TableWrap,
   Textarea,
 } from "@/components/ui";
+import { QuoteForm } from "@/components/quote-form";
+import { TenantInvoiceForm } from "@/components/tenant-invoice-form";
 import { createClient } from "@/lib/supabase/browser";
 import { formatCurrency, formatDate, formatDateTime, getStatusLabel } from "@/lib/format";
 import { createSignedUrlMap, removeFile, uploadFile } from "@/lib/storage";
 import type {
+  CompanySettings,
   InspectionReport,
   Job,
   JobDocument,
@@ -78,6 +81,9 @@ export default function JobDetailPage() {
   const [inspectionReports, setInspectionReports] = useState<DocumentListItem[]>([]);
   const [documents, setDocuments] = useState<JobDocumentWithUrl[]>([]);
   const [docType, setDocType] = useState("その他");
+  const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
+  const [showQuoteForm, setShowQuoteForm] = useState(false);
+  const [showInvoiceForm, setShowInvoiceForm] = useState(false);
 
   const hydrateSignedUrls = async (
     items: Array<{ id: string; path: string | null }>,
@@ -99,6 +105,7 @@ export default function JobDetailPage() {
       { data: invoiceData },
       { data: reportData },
       { data: documentData },
+      { data: companyData },
     ] = await Promise.all([
       supabase
         .from("jobs")
@@ -116,12 +123,12 @@ export default function JobDetailPage() {
         .order("created_at", { ascending: false }),
       supabase
         .from("quotes")
-        .select("id, quote_number, issue_date, total, pdf_path")
+        .select("id, quote_number, issue_date, total, pdf_path, line_items, notes")
         .eq("job_id", jobId)
         .order("created_at", { ascending: false }),
       supabase
         .from("tenant_invoices")
-        .select("id, invoice_number, issue_date, total, pdf_path, tenant_signature")
+        .select("id, invoice_number, issue_date, total, pdf_path, tenant_signature, line_items, deposit_offset, notes")
         .eq("job_id", jobId)
         .order("created_at", { ascending: false }),
       supabase
@@ -134,7 +141,12 @@ export default function JobDetailPage() {
         .select("*")
         .eq("job_id", jobId)
         .order("created_at", { ascending: false }),
+      supabase.from("company_settings").select("*").single(),
     ]);
+
+    if (companyData) {
+      setCompanySettings(companyData as CompanySettings);
+    }
 
     const currentJob = (jobData ?? null) as JobDetail | null;
     setJob(currentJob);
@@ -875,18 +887,148 @@ export default function JobDetailPage() {
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-3">
-        {renderDocumentTable("見積書", "実機で作成済みの見積 PDF", quotes)}
-        {renderDocumentTable(
-          "入居者請求書",
-          "入居者向け請求書とサイン状況",
-          tenantInvoices,
-        )}
+        <Card>
+          <CardHeader
+            title="見積書"
+            description="アプリ内で作成・PDF生成できます"
+            action={
+              companySettings ? (
+                <button
+                  onClick={() => setShowQuoteForm(true)}
+                  className="inline-flex items-center gap-1 rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-soft"
+                >
+                  <Plus size={14} />
+                  新規作成
+                </button>
+              ) : null
+            }
+          />
+          <CardBody>
+            {quotes.length === 0 ? (
+              <EmptyState title="まだ見積書がありません" description="「新規作成」ボタンから作成できます。" />
+            ) : (
+              <TableWrap>
+                <table className="min-w-full text-sm">
+                  <thead className="border-b border-line bg-panel-strong/70 text-left text-slate-500">
+                    <tr>
+                      <th className="px-4 py-3">番号</th>
+                      <th className="px-4 py-3">日付</th>
+                      <th className="px-4 py-3">金額</th>
+                      <th className="px-4 py-3 text-right">PDF</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {quotes.map((item) => (
+                      <tr key={item.id} className="border-b border-line/70">
+                        <td className="px-4 py-3 font-medium text-slate-900">{item.label}</td>
+                        <td className="px-4 py-3 text-slate-600">{formatDate(item.issueDate)}</td>
+                        <td className="px-4 py-3 text-slate-600">{formatCurrency(item.total)}</td>
+                        <td className="px-4 py-3 text-right">
+                          {item.signedUrl ? (
+                            <a href={item.signedUrl} target="_blank" rel="noreferrer"
+                              className="inline-flex rounded-xl bg-slate-100 px-3 py-2 font-medium text-slate-700 hover:bg-slate-200">
+                              開く
+                            </a>
+                          ) : (
+                            <span className="text-xs text-slate-400">未生成</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </TableWrap>
+            )}
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader
+            title="入居者請求書"
+            description="電子サイン付きPDFを生成できます"
+            action={
+              companySettings ? (
+                <button
+                  onClick={() => setShowInvoiceForm(true)}
+                  className="inline-flex items-center gap-1 rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-soft"
+                >
+                  <Plus size={14} />
+                  新規作成
+                </button>
+              ) : null
+            }
+          />
+          <CardBody>
+            {tenantInvoices.length === 0 ? (
+              <EmptyState title="まだ入居者請求書がありません" description="「新規作成」ボタンから作成できます。" />
+            ) : (
+              <TableWrap>
+                <table className="min-w-full text-sm">
+                  <thead className="border-b border-line bg-panel-strong/70 text-left text-slate-500">
+                    <tr>
+                      <th className="px-4 py-3">番号</th>
+                      <th className="px-4 py-3">日付</th>
+                      <th className="px-4 py-3">金額</th>
+                      <th className="px-4 py-3">サイン</th>
+                      <th className="px-4 py-3 text-right">PDF</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tenantInvoices.map((item) => (
+                      <tr key={item.id} className="border-b border-line/70">
+                        <td className="px-4 py-3 font-medium text-slate-900">{item.label}</td>
+                        <td className="px-4 py-3 text-slate-600">{formatDate(item.issueDate)}</td>
+                        <td className="px-4 py-3 text-slate-600">{formatCurrency(item.total)}</td>
+                        <td className="px-4 py-3 text-slate-500">{item.meta || "未サイン"}</td>
+                        <td className="px-4 py-3 text-right">
+                          {item.signedUrl ? (
+                            <a href={item.signedUrl} target="_blank" rel="noreferrer"
+                              className="inline-flex rounded-xl bg-slate-100 px-3 py-2 font-medium text-slate-700 hover:bg-slate-200">
+                              開く
+                            </a>
+                          ) : (
+                            <span className="text-xs text-slate-400">未生成</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </TableWrap>
+            )}
+          </CardBody>
+        </Card>
+
         {renderDocumentTable(
           "立会チェックリスト",
           "立会レポート PDF とサイン状況",
           inspectionReports,
         )}
       </div>
+
+      {showQuoteForm && companySettings ? (
+        <QuoteForm
+          jobId={jobId}
+          jobTitle={job.title}
+          managementCompanyName={company?.name ?? ""}
+          company={companySettings}
+          onClose={() => setShowQuoteForm(false)}
+          onSaved={() => void load()}
+        />
+      ) : null}
+
+      {showInvoiceForm && companySettings ? (
+        <TenantInvoiceForm
+          jobId={jobId}
+          jobTitle={job.title}
+          tenantName={job.tenant_name ?? ""}
+          depositAmount={job.deposit_amount ?? 0}
+          prepaidAmount={job.prepaid_amount ?? 0}
+          company={companySettings}
+          onClose={() => setShowInvoiceForm(false)}
+          onSaved={() => void load()}
+        />
+      ) : null}
 
       <Card className="mt-6">
         <CardHeader title="物件情報" description="号室、間取り、住所、管理会社" />

@@ -161,6 +161,14 @@ export type WorkOrder = {
   paid_at: Nullable<string>;
 };
 
+export type QuoteLineItem = {
+  name: string;
+  qty: number;
+  unit: string;
+  unit_price: number;
+  amount: number;
+};
+
 export type Quote = {
   id: string;
   job_id: string;
@@ -168,6 +176,18 @@ export type Quote = {
   issue_date: Nullable<string>;
   total: Nullable<number>;
   pdf_path: Nullable<string>;
+  line_items: Nullable<QuoteLineItem[]>;
+  notes: Nullable<string>;
+};
+
+export type TenantInvoiceLineItem = {
+  name: string;
+  qty: number;
+  unit: string;
+  unit_price: number;
+  amount: number;
+  ratio: number;
+  tenant_amount: number;
 };
 
 export type TenantInvoice = {
@@ -178,6 +198,9 @@ export type TenantInvoice = {
   total: Nullable<number>;
   pdf_path: Nullable<string>;
   tenant_signature: Nullable<string>;
+  line_items: Nullable<TenantInvoiceLineItem[]>;
+  deposit_offset: Nullable<number>;
+  notes: Nullable<string>;
 };
 
 export type InspectionReport = {

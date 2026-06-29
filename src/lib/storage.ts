@@ -39,7 +39,7 @@ export const createSignedUrlMap = async (bucket: string, paths: string[]) => {
 export const uploadFile = async (
   bucket: string,
   path: string,
-  file: File,
+  file: File | Blob,
   contentType?: string,
 ) => {
   const supabase = createClient();
