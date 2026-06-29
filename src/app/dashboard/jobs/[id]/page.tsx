@@ -84,6 +84,10 @@ export default function JobDetailPage() {
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
   const [showQuoteForm, setShowQuoteForm] = useState(false);
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
+  const [editingQuote, setEditingQuote] = useState<Quote | null>(null);
+  const [editingInvoice, setEditingInvoice] = useState<TenantInvoice | null>(null);
+  const [quotesRaw, setQuotesRaw] = useState<Quote[]>([]);
+  const [invoicesRaw, setInvoicesRaw] = useState<TenantInvoice[]>([]);
 
   const hydrateSignedUrls = async (
     items: Array<{ id: string; path: string | null }>,
@@ -178,6 +182,8 @@ export default function JobDetailPage() {
       })),
     );
 
+    setQuotesRaw((quoteData ?? []) as Quote[]);
+    setInvoicesRaw((invoiceData ?? []) as TenantInvoice[]);
     setQuotes(
       ((quoteData ?? []) as Quote[]).map((item) => ({
         id: item.id,
@@ -894,7 +900,10 @@ export default function JobDetailPage() {
             action={
               companySettings ? (
                 <button
-                  onClick={() => setShowQuoteForm(true)}
+                  onClick={() => {
+                    setEditingQuote(null);
+                    setShowQuoteForm(true);
+                  }}
                   className="inline-flex items-center gap-1 rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-soft"
                 >
                   <Plus size={14} />
@@ -914,7 +923,7 @@ export default function JobDetailPage() {
                       <th className="px-4 py-3">番号</th>
                       <th className="px-4 py-3">日付</th>
                       <th className="px-4 py-3">金額</th>
-                      <th className="px-4 py-3 text-right">PDF</th>
+                      <th className="px-4 py-3 text-right">操作</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -923,15 +932,31 @@ export default function JobDetailPage() {
                         <td className="px-4 py-3 font-medium text-slate-900">{item.label}</td>
                         <td className="px-4 py-3 text-slate-600">{formatDate(item.issueDate)}</td>
                         <td className="px-4 py-3 text-slate-600">{formatCurrency(item.total)}</td>
-                        <td className="px-4 py-3 text-right">
-                          {item.signedUrl ? (
-                            <a href={item.signedUrl} target="_blank" rel="noreferrer"
-                              className="inline-flex rounded-xl bg-slate-100 px-3 py-2 font-medium text-slate-700 hover:bg-slate-200">
-                              開く
-                            </a>
-                          ) : (
-                            <span className="text-xs text-slate-400">未生成</span>
-                          )}
+                        <td className="px-4 py-3">
+                          <div className="flex items-center justify-end gap-2">
+                            {companySettings ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditingQuote(
+                                    quotesRaw.find((q) => q.id === item.id) ?? null,
+                                  );
+                                  setShowQuoteForm(true);
+                                }}
+                                className="inline-flex rounded-xl border border-line bg-white px-3 py-2 font-medium text-slate-700 hover:bg-panel-strong"
+                              >
+                                編集
+                              </button>
+                            ) : null}
+                            {item.signedUrl ? (
+                              <a href={item.signedUrl} target="_blank" rel="noreferrer"
+                                className="inline-flex rounded-xl bg-slate-100 px-3 py-2 font-medium text-slate-700 hover:bg-slate-200">
+                                開く
+                              </a>
+                            ) : (
+                              <span className="text-xs text-slate-400">未生成</span>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -949,7 +974,10 @@ export default function JobDetailPage() {
             action={
               companySettings ? (
                 <button
-                  onClick={() => setShowInvoiceForm(true)}
+                  onClick={() => {
+                    setEditingInvoice(null);
+                    setShowInvoiceForm(true);
+                  }}
                   className="inline-flex items-center gap-1 rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-soft"
                 >
                   <Plus size={14} />
@@ -970,7 +998,7 @@ export default function JobDetailPage() {
                       <th className="px-4 py-3">日付</th>
                       <th className="px-4 py-3">金額</th>
                       <th className="px-4 py-3">サイン</th>
-                      <th className="px-4 py-3 text-right">PDF</th>
+                      <th className="px-4 py-3 text-right">操作</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -980,15 +1008,31 @@ export default function JobDetailPage() {
                         <td className="px-4 py-3 text-slate-600">{formatDate(item.issueDate)}</td>
                         <td className="px-4 py-3 text-slate-600">{formatCurrency(item.total)}</td>
                         <td className="px-4 py-3 text-slate-500">{item.meta || "未サイン"}</td>
-                        <td className="px-4 py-3 text-right">
-                          {item.signedUrl ? (
-                            <a href={item.signedUrl} target="_blank" rel="noreferrer"
-                              className="inline-flex rounded-xl bg-slate-100 px-3 py-2 font-medium text-slate-700 hover:bg-slate-200">
-                              開く
-                            </a>
-                          ) : (
-                            <span className="text-xs text-slate-400">未生成</span>
-                          )}
+                        <td className="px-4 py-3">
+                          <div className="flex items-center justify-end gap-2">
+                            {companySettings ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditingInvoice(
+                                    invoicesRaw.find((q) => q.id === item.id) ?? null,
+                                  );
+                                  setShowInvoiceForm(true);
+                                }}
+                                className="inline-flex rounded-xl border border-line bg-white px-3 py-2 font-medium text-slate-700 hover:bg-panel-strong"
+                              >
+                                編集
+                              </button>
+                            ) : null}
+                            {item.signedUrl ? (
+                              <a href={item.signedUrl} target="_blank" rel="noreferrer"
+                                className="inline-flex rounded-xl bg-slate-100 px-3 py-2 font-medium text-slate-700 hover:bg-slate-200">
+                                開く
+                              </a>
+                            ) : (
+                              <span className="text-xs text-slate-400">未生成</span>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1012,7 +1056,11 @@ export default function JobDetailPage() {
           jobTitle={job.title}
           managementCompanyName={company?.name ?? ""}
           company={companySettings}
-          onClose={() => setShowQuoteForm(false)}
+          existing={editingQuote}
+          onClose={() => {
+            setShowQuoteForm(false);
+            setEditingQuote(null);
+          }}
           onSaved={() => void load()}
         />
       ) : null}
@@ -1025,7 +1073,11 @@ export default function JobDetailPage() {
           depositAmount={job.deposit_amount ?? 0}
           prepaidAmount={job.prepaid_amount ?? 0}
           company={companySettings}
-          onClose={() => setShowInvoiceForm(false)}
+          existing={editingInvoice}
+          onClose={() => {
+            setShowInvoiceForm(false);
+            setEditingInvoice(null);
+          }}
           onSaved={() => void load()}
         />
       ) : null}

@@ -65,13 +65,15 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 4,
   },
-  colName: { flex: 3 },
+  colName: { flex: 2, paddingRight: 4 },
+  colDescription: { flex: 2, paddingRight: 4 },
   colQty: { width: 36, textAlign: "right" },
   colUnit: { width: 28, textAlign: "center" },
-  colUnitPrice: { width: 60, textAlign: "right" },
-  colAmount: { width: 60, textAlign: "right" },
+  colUnitPrice: { width: 52, textAlign: "right" },
+  colAmount: { width: 52, textAlign: "right" },
   colRatio: { width: 36, textAlign: "right" },
-  colTenantAmount: { width: 70, textAlign: "right" },
+  colTenantAmount: { width: 60, textAlign: "right" },
+  colLandlordAmount: { width: 60, textAlign: "right" },
   headerText: { fontSize: 8, color: "#64748b" },
   summaryBox: {
     border: "1pt solid #e2e8f0",
@@ -98,6 +100,17 @@ const styles = StyleSheet.create({
     color: "#475569",
     lineHeight: 1.6,
   },
+  bankBox: {
+    marginBottom: 16,
+    border: "1pt solid #e2e8f0",
+    borderRadius: 4,
+    padding: 10,
+    backgroundColor: "#f8fafc",
+  },
+  bankTitle: { fontSize: 10, fontWeight: "bold", marginBottom: 6, color: "#475569" },
+  bankRow: { flexDirection: "row", marginBottom: 2 },
+  bankLabel: { fontSize: 9, color: "#64748b", width: 72 },
+  bankValue: { fontSize: 9, color: "#1e293b" },
 });
 
 const fmt = (amount: number) => `¥${amount.toLocaleString("ja-JP")}`;
@@ -130,6 +143,7 @@ export function TenantInvoicePdf({
   signatureDataUrl,
 }: Props) {
   const tenantTotal = lineItems.reduce((sum, item) => sum + item.tenant_amount, 0);
+  const landlordTotal = lineItems.reduce((s, i) => s + (i.landlord_amount ?? (i.amount - i.tenant_amount)), 0);
   const tax = Math.floor(tenantTotal * 0.1);
   const grossTotal = tenantTotal + tax;
   const received = (depositAmount || 0) + (prepaidAmount || 0);
@@ -167,22 +181,26 @@ export function TenantInvoicePdf({
         <View style={styles.table}>
           <View style={styles.tableHeader}>
             <Text style={{ ...styles.colName, ...styles.headerText }}>工事項目</Text>
+            <Text style={{ ...styles.colDescription, ...styles.headerText }}>摘要</Text>
             <Text style={{ ...styles.colQty, ...styles.headerText }}>数量</Text>
             <Text style={{ ...styles.colUnit, ...styles.headerText }}>単位</Text>
             <Text style={{ ...styles.colUnitPrice, ...styles.headerText }}>単価</Text>
             <Text style={{ ...styles.colAmount, ...styles.headerText }}>金額</Text>
             <Text style={{ ...styles.colRatio, ...styles.headerText }}>負担</Text>
-            <Text style={{ ...styles.colTenantAmount, ...styles.headerText }}>入居者負担額</Text>
+            <Text style={{ ...styles.colTenantAmount, ...styles.headerText }}>入居者負担</Text>
+            <Text style={{ ...styles.colLandlordAmount, ...styles.headerText }}>賃貸人負担</Text>
           </View>
           {lineItems.map((item, index) => (
             <View key={index} style={styles.tableRow}>
               <Text style={styles.colName}>{item.name}</Text>
+              <Text style={styles.colDescription}>{item.description || ""}</Text>
               <Text style={styles.colQty}>{item.qty}</Text>
               <Text style={styles.colUnit}>{item.unit}</Text>
               <Text style={styles.colUnitPrice}>{fmt(item.unit_price)}</Text>
               <Text style={styles.colAmount}>{fmt(item.amount)}</Text>
               <Text style={styles.colRatio}>{item.ratio}%</Text>
               <Text style={styles.colTenantAmount}>{fmt(item.tenant_amount)}</Text>
+              <Text style={styles.colLandlordAmount}>{fmt(item.landlord_amount ?? (item.amount - item.tenant_amount))}</Text>
             </View>
           ))}
         </View>
@@ -224,7 +242,47 @@ export function TenantInvoicePdf({
               {balance >= 0 ? fmt(balance) : `${fmt(Math.abs(balance))} 返金`}
             </Text>
           </View>
+          <View style={{ ...styles.summaryRow, borderTop: "1pt solid #e2e8f0", marginTop: 8, paddingTop: 4 }}>
+            <Text style={{ fontSize: 8, color: "#94a3b8" }}>賃貸人負担合計（オーナー処理・参考）</Text>
+            <Text style={{ fontSize: 8, color: "#94a3b8" }}>{fmt(landlordTotal)}</Text>
+          </View>
         </View>
+
+        {balance > 0 && (company.bank_name || company.bank_account_number) ? (
+          <View style={styles.bankBox}>
+            <Text style={styles.bankTitle}>お振込先</Text>
+            {company.bank_name ? (
+              <View style={styles.bankRow}>
+                <Text style={styles.bankLabel}>金融機関</Text>
+                <Text style={styles.bankValue}>
+                  {company.bank_name}
+                  {company.bank_branch ? ` ${company.bank_branch}` : ""}
+                </Text>
+              </View>
+            ) : null}
+            {company.bank_account_number ? (
+              <View style={styles.bankRow}>
+                <Text style={styles.bankLabel}>口座番号</Text>
+                <Text style={styles.bankValue}>
+                  {company.bank_account_type ? `${company.bank_account_type} ` : ""}
+                  {company.bank_account_number}
+                </Text>
+              </View>
+            ) : null}
+            {company.bank_account_holder ? (
+              <View style={styles.bankRow}>
+                <Text style={styles.bankLabel}>口座名義</Text>
+                <Text style={styles.bankValue}>{company.bank_account_holder}</Text>
+              </View>
+            ) : null}
+            {company.invoice_registration_number ? (
+              <View style={styles.bankRow}>
+                <Text style={styles.bankLabel}>登録番号</Text>
+                <Text style={styles.bankValue}>{company.invoice_registration_number}</Text>
+              </View>
+            ) : null}
+          </View>
+        ) : null}
 
         {notes ? <Text style={styles.notes}>備考：{notes}</Text> : null}
 

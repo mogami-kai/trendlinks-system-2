@@ -167,6 +167,9 @@ export type QuoteLineItem = {
   unit: string;
   unit_price: number;
   amount: number;
+  work_item_id?: Nullable<string>;
+  category?: Nullable<string>;
+  description?: Nullable<string>;
 };
 
 export type Quote = {
@@ -188,6 +191,10 @@ export type TenantInvoiceLineItem = {
   amount: number;
   ratio: number;
   tenant_amount: number;
+  landlord_amount?: number;
+  work_item_id?: Nullable<string>;
+  category?: Nullable<string>;
+  description?: Nullable<string>;
 };
 
 export type TenantInvoice = {

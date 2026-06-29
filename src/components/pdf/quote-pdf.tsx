@@ -85,7 +85,8 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 4,
   },
-  colName: { flex: 3 },
+  colName: { flex: 2 },
+  colDescription: { flex: 2, fontSize: 10 },
   colQty: { width: 40, textAlign: "right" },
   colUnit: { width: 30, textAlign: "center" },
   colUnitPrice: { width: 70, textAlign: "right" },
@@ -175,6 +176,7 @@ export function QuotePdf({
         <View style={styles.table}>
           <View style={styles.tableHeader}>
             <Text style={{ ...styles.colName, ...styles.headerText }}>工事項目</Text>
+            <Text style={{ ...styles.colDescription, ...styles.headerText }}>摘要</Text>
             <Text style={{ ...styles.colQty, ...styles.headerText }}>数量</Text>
             <Text style={{ ...styles.colUnit, ...styles.headerText }}>単位</Text>
             <Text style={{ ...styles.colUnitPrice, ...styles.headerText }}>単価</Text>
@@ -183,6 +185,7 @@ export function QuotePdf({
           {lineItems.map((item, index) => (
             <View key={index} style={styles.tableRow}>
               <Text style={styles.colName}>{item.name}</Text>
+              <Text style={styles.colDescription}>{item.description || ""}</Text>
               <Text style={styles.colQty}>{item.qty}</Text>
               <Text style={styles.colUnit}>{item.unit}</Text>
               <Text style={styles.colUnitPrice}>{formatCurrency(item.unit_price)}</Text>
