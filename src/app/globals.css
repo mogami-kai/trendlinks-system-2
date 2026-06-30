@@ -11,6 +11,16 @@
   --accent: #b98b43;
   --danger: #b91c1c;
   --success: #166534;
+
+  /* 文字の階層（ink 3段）・境界の濃淡・フォーカス・質感トークン（加点） */
+  --ink: #182028;
+  --ink-2: #475569;
+  --ink-3: #64748b;
+  --line-strong: #c6bca7;
+  --ring: rgba(51, 65, 85, 0.13);
+  --accent-soft: rgba(185, 139, 67, 0.14);
+  --shadow-card: 0 18px 48px rgba(15, 23, 42, 0.06);
+  --shadow-raise: 0 22px 60px rgba(15, 23, 42, 0.09);
 }
 
 @theme inline {
@@ -19,19 +29,30 @@
   --color-panel: var(--panel);
   --color-panel-strong: var(--panel-strong);
   --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
   --color-brand: var(--brand);
   --color-brand-soft: var(--brand-soft);
   --color-accent: var(--accent);
   --color-danger: var(--danger);
   --color-success: var(--success);
-  --font-sans: var(--font-geist-sans);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --font-sans: var(--font-geist-sans), var(--font-noto-sans-jp);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), sans-serif;
+  /* 英数字は Geist、和文は Noto Sans JP に自動で流れる。最後にOSの安全網。 */
+  font-family:
+    var(--font-geist-sans), var(--font-noto-sans-jp), system-ui, -apple-system,
+    "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* このアプリ本来の暖色アンビエント。LP的な装飾（グレイン等）は足さない。 */
   background-image:
     radial-gradient(circle at top left, rgba(185, 139, 67, 0.12), transparent 28%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(245, 243, 238, 0.95));
@@ -50,8 +71,15 @@ select {
     transform 0.18s ease;
 }
 
+/* 数値（金額・指標・テーブル）は等幅で桁を揃える */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
 ::selection {
-  background: rgba(185, 139, 67, 0.2);
+  background: rgba(185, 139, 67, 0.24);
+  color: var(--foreground);
 }
 
 .thin-scrollbar {
@@ -68,6 +96,22 @@ select {
   border-radius: 999px;
 }
 
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(51, 65, 85, 0.4);
+}
+
 .thin-scrollbar::-webkit-scrollbar-track {
   background: transparent;
+}
+
+/* モーション配慮：減らす設定の人には演出を止める */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

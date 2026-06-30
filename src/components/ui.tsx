@@ -13,15 +13,15 @@ export const Button = ({
 }: ButtonProps) => (
   <button
     className={clsx(
-      "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium shadow-sm disabled:cursor-not-allowed disabled:opacity-50",
+      "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium shadow-sm outline-none transition active:translate-y-px focus-visible:shadow-[0_0_0_3px_var(--ring)] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
       variant === "primary" &&
         "bg-brand text-white hover:bg-brand-soft",
       variant === "secondary" &&
-        "border border-line bg-white text-slate-700 hover:bg-panel-strong",
+        "border border-line bg-white text-slate-700 hover:border-line-strong hover:bg-panel-strong",
       variant === "ghost" &&
         "text-slate-700 hover:bg-slate-100",
       variant === "danger" &&
-        "bg-red-700 text-white hover:bg-red-800",
+        "bg-danger text-white hover:bg-red-800",
       className,
     )}
     {...props}
@@ -40,7 +40,7 @@ export const LinkButton = ({
   <Link
     href={href}
     className={clsx(
-      "inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-soft",
+      "inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm outline-none transition active:translate-y-px hover:bg-brand-soft focus-visible:shadow-[0_0_0_3px_var(--ring)]",
       className,
     )}
   >
@@ -54,7 +54,7 @@ export const Input = ({
 }: React.InputHTMLAttributes<HTMLInputElement>) => (
   <input
     className={clsx(
-      "w-full rounded-xl border border-line bg-white px-3 py-2.5 text-sm outline-none ring-0 placeholder:text-slate-400 focus:border-brand-soft focus:shadow-[0_0_0_3px_rgba(51,65,85,0.10)]",
+      "w-full rounded-xl border border-line bg-white px-3 py-2.5 text-sm outline-none ring-0 transition placeholder:text-slate-400 hover:border-line-strong focus:border-brand-soft focus:shadow-[0_0_0_3px_var(--ring)]",
       className,
     )}
     {...props}
@@ -67,7 +67,7 @@ export const Textarea = ({
 }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
   <textarea
     className={clsx(
-      "w-full rounded-xl border border-line bg-white px-3 py-2.5 text-sm outline-none ring-0 placeholder:text-slate-400 focus:border-brand-soft focus:shadow-[0_0_0_3px_rgba(51,65,85,0.10)]",
+      "w-full rounded-xl border border-line bg-white px-3 py-2.5 text-sm outline-none ring-0 transition placeholder:text-slate-400 hover:border-line-strong focus:border-brand-soft focus:shadow-[0_0_0_3px_var(--ring)]",
       className,
     )}
     {...props}
@@ -81,7 +81,7 @@ export const Select = ({
 }: React.SelectHTMLAttributes<HTMLSelectElement>) => (
   <select
     className={clsx(
-      "w-full rounded-xl border border-line bg-white px-3 py-2.5 text-sm outline-none ring-0 focus:border-brand-soft focus:shadow-[0_0_0_3px_rgba(51,65,85,0.10)]",
+      "w-full rounded-xl border border-line bg-white px-3 py-2.5 text-sm outline-none ring-0 transition hover:border-line-strong focus:border-brand-soft focus:shadow-[0_0_0_3px_var(--ring)]",
       className,
     )}
     {...props}
@@ -99,7 +99,7 @@ export const Card = ({
 }) => (
   <section
     className={clsx(
-      "rounded-[24px] border border-line bg-panel shadow-[0_20px_60px_rgba(15,23,42,0.05)]",
+      "rounded-[24px] border border-line bg-panel shadow-[var(--shadow-card)]",
       className,
     )}
   >
@@ -187,7 +187,7 @@ export const StatCard = ({
       <p className="text-sm uppercase tracking-[0.18em] text-slate-400">
         {label}
       </p>
-      <div className="text-3xl font-semibold text-slate-900">{value}</div>
+      <div className="tnum text-3xl font-semibold text-slate-900">{value}</div>
       {sublabel ? <p className="text-sm text-slate-500">{sublabel}</p> : null}
     </CardBody>
   </Card>
