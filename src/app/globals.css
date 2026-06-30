@@ -58,6 +58,8 @@ body {
     linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(245, 243, 238, 0.95));
 }
 
+/* ホバー時の色・境界・影だけをなめらかに。押下の transform は遅延させず即時に効かせ、
+   「押すと拡大・縮小して見える」違和感を防ぐ。 */
 a,
 button,
 input,
@@ -67,8 +69,7 @@ select {
     background-color 0.18s ease,
     color 0.18s ease,
     border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    transform 0.18s ease;
+    box-shadow 0.18s ease;
 }
 
 /* 数値（金額・指標・テーブル）は等幅で桁を揃える */

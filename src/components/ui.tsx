@@ -13,7 +13,7 @@ export const Button = ({
 }: ButtonProps) => (
   <button
     className={clsx(
-      "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium shadow-sm outline-none transition active:translate-y-px focus-visible:shadow-[0_0_0_3px_var(--ring)] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+      "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium shadow-sm outline-none transition-[color,background-color,border-color,box-shadow] active:translate-y-px focus-visible:shadow-[0_0_0_3px_var(--ring)] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
       variant === "primary" &&
         "bg-brand text-white hover:bg-brand-soft",
       variant === "secondary" &&
@@ -40,7 +40,7 @@ export const LinkButton = ({
   <Link
     href={href}
     className={clsx(
-      "inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm outline-none transition active:translate-y-px hover:bg-brand-soft focus-visible:shadow-[0_0_0_3px_var(--ring)]",
+      "inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm outline-none transition-[color,background-color,border-color,box-shadow] active:translate-y-px hover:bg-brand-soft focus-visible:shadow-[0_0_0_3px_var(--ring)]",
       className,
     )}
   >
