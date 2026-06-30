@@ -52,7 +52,7 @@ export const AppShell = ({
                 key={item.href}
                 href={item.href}
                 className={clsx(
-                  "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium",
+                  "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition active:translate-y-px",
                   active
                     ? "bg-brand text-white shadow-md shadow-slate-900/10"
                     : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
@@ -108,10 +108,10 @@ export const AppShell = ({
                   key={item.href}
                   href={item.href}
                   className={clsx(
-                    "inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium",
+                    "inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium transition active:scale-[0.98]",
                     active
                       ? "border-brand bg-brand text-white shadow-sm shadow-slate-900/10"
-                      : "border-line bg-white text-slate-600",
+                      : "border-line bg-white text-slate-600 hover:border-line-strong hover:text-slate-900",
                   )}
                 >
                   <Icon size={16} />

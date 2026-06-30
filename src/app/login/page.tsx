@@ -56,7 +56,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-transparent px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand text-white shadow-lg shadow-slate-900/20">
@@ -65,7 +65,7 @@ export default function LoginPage() {
           <h1 className="text-xl font-semibold text-slate-900">TrendLinks</h1>
         </div>
 
-        <div className="rounded-2xl border border-line bg-white px-6 py-8 shadow-sm">
+        <div className="rounded-2xl border border-line bg-panel px-6 py-8 shadow-[var(--shadow-card)]">
           <form className="space-y-4" onSubmit={onSubmit}>
             <Field label="メールアドレス">
               <Input
